@@ -19,6 +19,7 @@ A secure Laravel 12 + PHP 8 project that demonstrates:
 7. Friendly error handling and flash messages
 8. Session timeout tracking with invalidation on inactivity
 9. CSRF protection via Laravel form tokens
+10. Password reset feature via email (SMTP-ready)
 
 ## Tech Stack
 
@@ -89,6 +90,22 @@ php artisan test
 - Session cookies are configured for encryption and secure cookies in production.
 - Blade output escaping helps prevent XSS.
 - PDO prepared statements help prevent SQL injection.
+- Password reset uses a one-time token stored in `password_reset_tokens` and expires after 60 minutes.
+
+## SMTP Setup (Hostinger)
+
+Set these in your `.env` (do not commit secrets):
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=YOUR_SMTP_HOST
+MAIL_PORT=587
+MAIL_USERNAME=YOUR_EMAIL
+MAIL_PASSWORD=YOUR_PASSWORD
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="YOUR_EMAIL"
+MAIL_FROM_NAME="Student Portal"
+```
 
 ## Important Files
 
@@ -99,6 +116,9 @@ php artisan test
 - `app/Repositories/ProfileRepository.php`
 - `app/Http/Middleware/EnsureAuthenticated.php`
 - `app/Http/Middleware/EnforceSessionTimeout.php`
+- `app/Http/Controllers/PasswordResetController.php`
+- `app/Repositories/PasswordResetTokenRepository.php`
+- `app/Mail/PasswordResetLinkMail.php`
 - `database/migrations/2026_07_31_101500_create_profiles_table.php`
 - `database/schema.sql`
 

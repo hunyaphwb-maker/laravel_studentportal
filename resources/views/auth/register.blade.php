@@ -2,7 +2,7 @@
 
 @section('content')
     <section class="mx-auto max-w-xl py-10">
-        <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur">
+        <div class="card">
             <div class="mb-8 space-y-2 text-center">
                 <h1 class="text-3xl font-semibold text-white">Create your account</h1>
                 <p class="text-sm text-slate-300">Register securely, then start managing profile records from your dashboard.</p>
@@ -80,7 +80,7 @@
 
             <p class="mt-6 text-center text-sm text-slate-300">
                 Already registered?
-                <a href="{{ route('login') }}" class="font-semibold text-cyan-200 hover:text-cyan-100">Go to login</a>
+                <a href="{{ route('login') }}" class="font-semibold text-slate-100 hover:text-white">Go to login</a>
             </p>
         </div>
     </section>

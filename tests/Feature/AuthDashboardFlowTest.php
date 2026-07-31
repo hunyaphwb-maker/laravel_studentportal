@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -64,5 +65,54 @@ class AuthDashboardFlowTest extends TestCase
         $this->assertDatabaseMissing('profiles', [
             'id' => $profileId,
         ]);
+    }
+
+    public function test_password_reset_flow_updates_the_password(): void
+    {
+        Mail::fake();
+
+        $email = 'maria@example.com';
+
+        $this->post('/register', [
+            'name' => 'Maria Santos',
+            'email' => $email,
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ])->assertRedirect('/dashboard');
+
+        $this->post('/logout')->assertRedirect('/login');
+
+        $this->post('/forgot-password', [
+            'email' => $email,
+        ])->assertSessionHas('success');
+
+        $tokenHash = DB::table('password_reset_tokens')->where('email', $email)->value('token');
+
+        $this->assertNotNull($tokenHash);
+
+        $this->post('/reset-password', [
+            'email' => $email,
+            'token' => 'wrong-token',
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ])->assertSessionHasErrors();
+
+        $plainToken = 'fixed-token-for-test';
+        DB::table('password_reset_tokens')->where('email', $email)->update([
+            'token' => hash('sha256', $plainToken),
+            'created_at' => now()->toDateTimeString(),
+        ]);
+
+        $this->post('/reset-password', [
+            'email' => $email,
+            'token' => $plainToken,
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ])->assertRedirect('/login');
+
+        $this->post('/login', [
+            'email' => $email,
+            'password' => 'newpassword123',
+        ])->assertRedirect('/dashboard');
     }
 }

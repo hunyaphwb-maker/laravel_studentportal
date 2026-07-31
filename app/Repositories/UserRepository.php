@@ -61,6 +61,22 @@ class UserRepository
         return (int) $this->connection()->lastInsertId();
     }
 
+    public function updatePasswordByEmail(string $email, string $hashedPassword): bool
+    {
+        $statement = $this->connection()->prepare(
+            'UPDATE users
+             SET password = :password,
+                 updated_at = :updated_at
+             WHERE email = :email'
+        );
+
+        return $statement->execute([
+            'email' => $email,
+            'password' => $hashedPassword,
+            'updated_at' => now()->toDateTimeString(),
+        ]);
+    }
+
     public function isDuplicateEmail(PDOException $exception): bool
     {
         return str_contains(strtolower($exception->getMessage()), 'users.email');
